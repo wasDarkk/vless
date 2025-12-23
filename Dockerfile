@@ -1,13 +1,18 @@
-FROM node:slim
-
-ENV NODE_ENV=production
-ENV PORT=4100
-ENV UUID=dc523887-b4de-4e48-bdd2-11ab20bddbf9
+FROM node:20-slim
 
 WORKDIR /app
 
-COPY dist dist/
+COPY package.json package-lock.json ./
+RUN npm install
 
-EXPOSE 4100
+COPY . .
 
-CMD ["node", "./dist/apps/node-vless/main.js"]
+# 🔥 THIS IS THE FIX
+RUN npm run build
+
+ENV NODE_ENV=production
+ENV PORT=8080
+
+EXPOSE 8080
+
+CMD ["node", "dist/apps/node-vless/main.js"]
