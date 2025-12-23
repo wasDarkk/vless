@@ -1,25 +1,14 @@
-FROM node:20-slim
+# Use PHP with Apache
+FROM php:8.2-apache
 
-# Install required build tools for node-gyp
-RUN apt-get update && apt-get install -y \
-    python3 \
-    make \
-    g++ \
-    && rm -rf /var/lib/apt/lists/*
+# Enable useful extensions (optional, remove if not needed)
+RUN docker-php-ext-install mysqli pdo pdo_mysql
 
-WORKDIR /app
+# Copy your PHP files into Apache web root
+COPY . /var/www/html/
 
-COPY package.json package-lock.json ./
-RUN npm install
+# Set permissions
+RUN chown -R www-data:www-data /var/www/html
 
-COPY . .
-
-# If you need build output
-RUN npm run build || echo "skip build"
-
-ENV NODE_ENV=production
-ENV PORT=8080
-
-EXPOSE 8080
-
-CMD ["node", "dist/apps/node-vless/main.js"]
+# Expose web server port
+EXPOSE 80
